@@ -1,0 +1,85 @@
+const int signalPin= 0; //yellow wire connects to analog pin A0
+const int PumpOne= 13; //Pump connects to digital pin 13
+const int PumpTwo= 12; //Pump connects to digital pin 13
+int signal;//this variable, signal, will hold the analog value read by the arduino
+
+//LCD section
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
+// Set the LCD address to 0x27 for a 16 chars and 2 line display
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+void setup() {
+  digitalWrite(PumpOne, HIGH);
+  digitalWrite(PumpTwo, HIGH);
+
+Serial.begin(9600); //sets the baud rate for data transfer in bits/second 
+pinMode(signalPin, INPUT); //the infrared sensor signal line will be an input to the arduino
+pinMode(PumpOne, OUTPUT); //the Pump serves an output in the circuit
+pinMode(PumpTwo, OUTPUT); //the Pump serves an output in the circuit
+
+
+//LCD SECTION INIT
+// initialize the LCD
+  lcd.begin();
+
+  // Turn on the blacklight and print a message.
+  lcd.backlight();
+  lcd.print("VINYWAJI CHAP CHAP");
+  lcd.clear();
+  lcd.print("LOADING.... ");
+  delay(2000); 
+  lcd.clear();
+  lcd.print("READY TO SERVE ");
+  lcd.setCursor(1, 1);
+lcd.print("MADE IN MFA");
+  
+}
+
+void loop() {
+signal= analogRead(signalPin); //arduino reads the value from the infrared sensor
+Serial.println(signal); //prints out analog value
+delay(500); //delays the next analog reading by 500 ms or a half a second 
+
+if(signal > 400){ //if the analog value is less than 200, the object is within a few inches
+digitalWrite(PumpOne, LOW);
+lcd.clear();
+lcd.setCursor(2,0);
+lcd.print("SERVING....!");
+digitalWrite(PumpOne, LOW);
+delay(4000); 
+digitalWrite(PumpOne, HIGH);
+lcd.clear();
+lcd.setCursor(2,0);
+lcd.print("DONE....!");
+delay(4000); 
+lcd.clear();
+lcd.setCursor(2,0);
+lcd.print("KARIBU TENA..!");
+}
+else{
+digitalWrite(PumpOne, HIGH); 
+}
+
+
+//Second pump
+  if ((signal > 141) && (signal < 300)){ //if the analog value is less than 200, the object is within a few inches
+lcd.clear();
+lcd.setCursor(2,0);
+lcd.print("SERVING....!");
+digitalWrite(PumpTwo, LOW);
+delay(4000); 
+digitalWrite(PumpTwo, HIGH);
+lcd.clear();
+lcd.setCursor(2,0);
+lcd.print("DONE....!");
+delay(4000); 
+lcd.clear();
+lcd.setCursor(2,0);
+lcd.print("WELCOME AGAIN..!");
+
+}
+else{
+digitalWrite(PumpTwo, HIGH);
+}
+}
